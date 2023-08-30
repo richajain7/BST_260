@@ -1,0 +1,42 @@
+---
+title: "Homework 0"
+author: "Richa Jain"
+format: pdf
+editor: visual
+#execute: 
+#  echo: FALSE
+---
+```{r}
+quadratic_formula <- function(a, b, c){
+    discriminant = b^2 - 4*a*c
+    
+    if(discriminant < 0){
+      print("No Real Solution")
+    }
+    
+    else if(discriminant > 0){
+      sol1 <- (-b + sqrt(b^2 - 4*a*c))/(2*a)
+      sol2 <- (-b - sqrt(b^2 - 4*a*c))/(2*a)
+      cat("(", sol1, ", ", sol2, ")", "\n")
+    }
+}
+```
+
+# Exercise 1
+This provides a solution to the quadratic formula for a=1, b=3, and c=2
+```{r}
+a <- 1
+b <- 3
+c <- 2
+
+quadratic_formula(a, b, c)
+```
+
+# Exercise 2
+This provides a graph of f(x) versus x for $$ x \epsilon (-5,5) $$
+```{r}
+x <- seq(-5, 5, length=300)
+plot(x, a*x^2 + b*x + c, type = "l")
+abline(h=0, lty = 2)
+```
+

@@ -1,0 +1,20 @@
+---
+title: "Lecture 1"
+author: "Richa Jain"
+format: html
+editor: visual
+execute:
+  echo: FALSE
+---
+
+```{r}
+x <- 1
+y <- 3
+x + y
+```
+
+$$ y = \alpha + \beta x_i + \varepsilon $$
+```{r}
+
+```
+
