@@ -1,14 +1,15 @@
 ---
 title: "Homework 0"
 author: "Richa Jain"
-format: pdf
+format: html
 editor: visual
-#execute: 
-#  echo: FALSE
+execute: 
+  echo: FALSE
 ---
+
 ```{r}
 quadratic_formula <- function(a, b, c){
-    discriminant = b^2 - 4*a*c
+    discriminant <- (b^2) - (4*a*c)
     
     if(discriminant < 0){
       print("No Real Solution")
@@ -17,13 +18,26 @@ quadratic_formula <- function(a, b, c){
     else if(discriminant > 0){
       sol1 <- (-b + sqrt(b^2 - 4*a*c))/(2*a)
       sol2 <- (-b - sqrt(b^2 - 4*a*c))/(2*a)
-      cat("(", sol1, ", ", sol2, ")", "\n")
+      cat("The two solutions are: (", sol1, ", ", sol2, ")", "\n")
+    }
+    
+    else{
+      sol <- -b/(2*a)
+      paste0("There is one solution: ", sol)
     }
 }
 ```
 
 # Exercise 1
-This provides a solution to the quadratic formula for a=1, b=3, and c=2
+
+This provides a solution to the quadratic formula $ax^2 + bx + c = 0$ for various a, b, and c values. The one I calculated is for a=1, b=3, and c=2.
+
+The formula being used is: $x = \frac{{-b \pm \sqrt{{b^2 - 4ac}}}}{{2a}}$
+
+If the determinant ${b^2 - 4ac}$ is \< 0, then there are no real solutions to the quadratic equation. If the determinant is \> 0, there are two real solutions. If the determinant = 0, there is one real solution.
+
+The following solution is for a=1, b=3, and c=2:
+
 ```{r}
 a <- 1
 b <- 3
@@ -33,10 +47,13 @@ quadratic_formula(a, b, c)
 ```
 
 # Exercise 2
-This provides a graph of f(x) versus x for $$ x \epsilon (-5,5) $$
+
+This provides a graph of f(x) versus x for $x \epsilon (-5,5)$
+
+The line at y=0 is meant to indicate the solutions to the quadratic equation. The points where the quadratic graph meet the line y=0 are the solutions to the equation. If there are no real solutions, the line and graph will not meet.
+
 ```{r}
 x <- seq(-5, 5, length=300)
 plot(x, a*x^2 + b*x + c, type = "l")
 abline(h=0, lty = 2)
 ```
-
