@@ -1,0 +1,55 @@
+---
+title: "Importing Data"
+format: html
+editor: visual
+---
+
+```{r}
+library(dslabs)
+library(readr)
+```
+
+```{r}
+dir <- system.file("extdata", package = "dslabs")
+list.files(dir)
+```
+
+```{r}
+file_path <- file.path(dir, "murders.csv")
+file.copy(file_path, "murders.csv")
+```
+
+## Exercise 1
+
+```{r}
+path <- system.file("extdata", package = "dslabs")
+files <- list.files(path, pattern = 'csv')
+files
+#file_path <- file.path(files, "olive.csv")
+#file.copy(file_path, "olive.csv")
+```
+
+```{r}
+res <- lapply(files, function(fn) read_csv(file.path(path, fn)))
+```
+
+## Exercise 2
+
+```{r}
+read_csv(file.path(path, "olive.csv"))
+dat <- read_lines(file.path(path, "olive.csv"), n_max = 1)
+```
+
+```{r}
+names(dat)
+fn <- file.path(path, "olive.csv")
+header <- readLines(fn, n=1)
+dat <- read_csv(fn, col_names = FALSE, skip=1)
+dat
+```
+
+```{r}
+dat <- read_csv(fn)
+names(dat)[1] <- 'row_number'
+dat
+```

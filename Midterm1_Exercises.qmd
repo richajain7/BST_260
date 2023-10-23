@@ -1,0 +1,1535 @@
+---
+title: "Midterm1_Exercises"
+#execute: 
+#  echo: false
+#output-file: pdf
+---
+
+```{r}
+library(dslabs)
+```
+
+
+## 1 Quarto
+
+- to not show code:
+- execute:
+    - echo: false
+
+# Exercises
+```{r}
+a <- 1
+b <- -1
+c <- -2
+
+quad_formula <- function(a, b, c){
+  det_value <- (b^2) - (4*a*c)
+  if (det_value < 0){
+    print("No real solutions")
+  }
+  else if (det_value == 0){
+    sol_1 <- (-b)/(2*a)
+    paste0("There is one solution: ", sol_1)
+  }
+  else{
+    sol_2 <- (-b + sqrt(b^2 - 4*a*c))/(2*a)
+    sol_3 <- (-b - sqrt(b^2 - 4*a*c))/(2*a)
+    cat("The two solutions are: (", sol_2, ", ", sol_3, ")", "\n")
+  }
+}
+
+quad_formula(a, b, c)
+```
+
+```{r}
+a <- 1
+b <- -1
+c <- -2
+x <- seq(-5, 5, length = 300)
+plot(x, a*x^2 + b*x + c, type = "l")
+abline(h = 0, lty = 2)
+```
+
+## Unix
+
+- echo "Hello world" : prints Hello world
+- pwd : see current working directory
+- getwd() : current working directory in R
+- echo $HOME : full path to home directory
+- ls : listing directory content 
+- mkdir and rmdir : make and remove a directory
+- cd : navigating directories
+- mv : moving files
+- cp : copying files
+- rm : removing files - PERMANENT
+- less : looking at a file (type 2 to exit the viewer)
+- nano : edit a file 
+- man : getting help
+- ls --help : getting help
+- ls *.html : wildcard - print all files ending in html
+- ls file-???.html : wildcard
+
+# Exercises
+5. mkdir unix_exercises
+6. mkdir data rdas code docs
+7. cd rdas
+   curl https://raw.githubusercontent.com/rafalab/dslabs/master/inst/    extdata/murders.csv > murders.csv
+8. nano code-1.R
+   filename <- "rdas/murders.csv"
+   dat <- read.csv(filename)
+9. 
+10. nano code-2.R 
+    echo "load('../rdas/murders/rda')" > code-2.R
+11. ls *.R
+12. mv code/code-1.R code/import.R
+13. 
+
+## Git and Github
+
+- why use git and github: sharing, collaborating, version control
+- github https link
+- git init
+- git remote add origin <remote-url>
+- git status filename
+- git add filename or .
+- git commit -m "comment"
+- git push 
+- git push - u origin main (upstream)
+- git fetch
+- git merge
+- git pull
+- git checkout filename : pull down a specific file from remote repo
+- git clone <url>
+
+## R Basics
+- install.packages("packagename")
+- help system: ?name or help("name")
+```{r}
+ls(a)
+```
+- ls : see if a variable in in environment
+- rm : remove variable
+```{r}
+rm(a)
+```
+
+- str : give information about an object
+- typeof : basic data type of the object
+- class : class attribute of an object
+
+```{r}
+library(dslabs)
+typeof(murders)
+class(murders)
+str(murders)
+```
+- Dataframes: 
+  - rows = observations, columns = variables
+  - add columns:
+```{r}
+murders$pop_rank <- rank(murders$population)
+```
+
+  - use $ to access columns
+  - also use [row, columns]:
+```{r}
+murders[1:5,]
+murders[1:5, 1:2]
+murders[1:5, c("state", "abb")]
+```
+  
+- With : use column names as objects
+```{r}
+with(murders, length(state))
+```
+
+- Vectors: columns of dataframes are 1D vectors
+- use c() to create vectors
+```{r}
+x <- c("a", "b", "c")
+```
+
+- or seq()
+```{r}
+seq(1, 10)
+seq(1, 9, 2)
+seq_along(x)
+```
+
+- Factors: factors versus characters. 
+  - store levels and then the label of each level
+  - useful for categorical data
+```{r}
+x <- murders$region
+levels(x)
+```
+
+- Categories based on strata
+  - function cut
+  - convert numbers into categories
+```{r}
+with(murders, cut(population, c(0, 10^6, 10^7, Inf)))
+```
+```{r}
+murders$size <- cut(murders$population, c(0, 10^6, 10^7, Inf), labels = c("small", "medium", "large"))
+murders[1:6, c("state", "size")]
+```
+
+- you can change levels 
+```{r}
+factor(x, levels = sort(levels(murders$region)))
+```
+- make west the first level: 
+  - relevel(region, ref = "West")
+- order levels
+  - reorder(region, by_col_val, sum)
+  
+- NAs
+  - is.na()
+- Coercing
+  - when you do something nonsensical with data types
+  - errors
+  - avoid automatic coercion
+  - use as.character(), as.numeric()
+- Lists
+  - can have different types and length
+  - indexing starts at 1 in R
+- Functions
+```{r}
+f <- function(x, y, z = 0){
+  return(x + y + z)
+}
+```
+
+# Exercises
+
+```{r}
+n <- 100
+sum <- n*(n+1)/2
+sum
+```
+
+```{r}
+n <- 1000
+n*(n+1)/2
+```
+
+```{r}
+n <- 100
+x <- seq(1, n)
+sum(x)
+```
+
+```{r}
+log(sqrt(100), 10)
+```
+
+```{r}
+library(dslabs)
+str(murders)
+colnames(murders)
+```
+
+## Vectorization
+- mean() for average
+- standardize: 
+```{r}
+heights <- c(69, 62, 66, 70, 70, 73, 67, 73, 67, 70)
+heights * 2.54/100
+avg <- mean(heights)
+s <- sd(heights)
+(heights-avg)/2
+scale(heights)
+```
+- if it's two vectors, does it component wise
+
+- Exercise:
+```{r}
+library(dslabs)
+murders$rate <- murders$total/murders$population*10^5
+murders
+#or
+murders$rate <- with(murders, total/population*10^5)
+```
+
+- Functions that vectorize:
+  - most arithmetic functions work on vectors : sqrt, log, square
+  - if else does not vectorize but ifelse does
+  
+- Indexing: 
+  - vectorization works for logical relationships 
+```{r}
+ind <- murders$population < 10^6
+murders$state[ind]
+```
+  
+- Split:
+  - get indexes using a factor
+```{r}
+inds <- with(murders, split(seq_along(region), region))
+murders$state[inds$West]
+```
+
+- Functions for subsetting: which, match, %in%
+```{r}
+ind <- which(murders$state == "California")
+ind
+```
+```{r}
+ind <- match(c("New York", "Florida"), murders$state)
+ind
+```
+```{r}
+c("Boston", "California") %in% murders$state
+```
+
+- Sapply: apply functions that don't vectorize
+```{r}
+s <- function(n){
+  return(sum(1:n))
+}
+ns <- c(5, 25, 100)
+sapply(ns, s)
+```
+
+# Exercises
+
+```{r}
+library(dslabs)
+inds <- which(murders$rate < 1)
+murders[inds, ]
+```
+```{r}
+inds <- which(murders$rate < 1 & murders$region == "West")
+murders[inds, c(1, 2, 4, 5, 6, 7, 8)]
+```
+```{r}
+dat <- murders[murders$rate < 1, ]
+dat[which.max(dat$population), ]
+```
+```{r}
+dat <- murders[murders$population > 10^7, ]
+dat[which.min(dat$rate), ]
+```
+
+```{r}
+inds <- split(1:nrow(murders), murders$region)
+sapply(inds, function(x){
+  sum(murders$total[x]) / sum(murders$population[x]) * 10^5
+})
+```
+
+```{r}
+x <- seq(6, 55, 4/7)
+length(x)
+```
+
+```{r}
+temp <- c(35, 88, 42, 84, 81, 30)
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", 
+          "San Juan", "Toronto")
+city_temps <- data.frame(name = city, temperature = temp)
+```
+```{r}
+city_temps$temperature <- (city_temps$temperature - 32)/1.8
+city_temps
+```
+
+```{r}
+n <- 3
+vals <- seq(1,n)
+sum <- sum(1/vals^2)
+sum
+```
+
+```{r}
+abbs <- c("MA", "ME", "MI", "MO", "MU")
+!abbs %in% state.abb
+```
+
+```{r}
+states <- c("New York", "California", "Texas")
+ind <- match(states, murders$state)
+ind
+murders[ind, ]
+```
+
+## Tidyverse
+
+- library(tidyverse)
+- adding a column: mutate
+```{r}
+library(tidyverse)
+murders <- mutate(murders, rate = total/population*10^5)
+```
+- subsetting with filter
+```{r}
+filter(murders, rate <= 0.71)
+```
+- selecting columns with select
+- pipe: |> or %>% 
+- summarizing data: 
+  - summarize(avg = mean(rate))
+  - summarize(rate = sum(x)/sum(y))
+  - for multiple summaries in 1, use reframe() instead of summarize()
+  - column per summary: 
+```{r}
+median_min_max <- function(x){
+  qs <- quantile(x, c(0.5, 0, 1))
+  data.frame(median = qs[1], min = qs[2], max = qs[3])
+}
+murders %>% summarize(median_min_max(population))
+```
+  
+- group_by : compute by a column 
+- ungroup : summarize a variable but not collapse dataset --> group by, mutate, ungroup
+- pull : tidyverse returns a df even if it's just one number so can use pull() to get a number 
+- sorting dataframe: arrange(), use arrange(desc()) for descending - can use more than one variable 
+
+# Exercises
+
+```{r}
+murders <- mutate(murders, rate = total/population*10^5)
+murders %>% filter(rate < 1)
+```
+
+```{r}
+murders %>% filter(rate < 1 & region == "West") %>% select(state, abb, population, total, pop_rank, rate)
+```
+
+```{r}
+murders %>% filter(rate < 1) %>% slice_max(population)
+```
+```{r}
+murders %>% filter(population > 10^7) %>% slice_min(rate)
+```
+
+```{r}
+murders %>% group_by(region) %>% summarize(rate = sum(total)/sum(population)*10^5)
+```
+
+```{r}
+library(NHANES)
+```
+
+```{r}
+NHANES %>% filter(!is.na(Race1), !is.na(Race3)) %>% filter(as.character(Race1) != as.character(Race3)) %>% count(Race1, Race3)
+```
+
+```{r}
+dat <- NHANES %>% mutate(race = Race3) %>% mutate(race = if_else(is.na(race), Race1, race))
+```
+
+```{r}
+dat %>% group_by(race, Gender) %>% summarize(n = sum(!is.na(SmokeNow)), smoke = sum(SmokeNow == "Yes", na.rm = TRUE)) %>% mutate(smoke = smoke/n) %>% arrange(desc(n))
+```
+
+```{r}
+dat <- dat %>% 
+  mutate(race = forcats::fct_collapse(race, Hispanic = c("Mexican", "Hispanic"))) %>% filter(race != "Other") #%>% mutate(race = droplevels(race))
+dat
+```
+```{r}
+dat %>% group_by(race, Gender) %>% summarize(n = sum(!is.na(Smoke100)), smoke = sum(SmokeNow == "Yes", na.rm = TRUE)) %>% mutate(smoke = smoke/n) %>% arrange(desc(smoke))
+```
+
+```{r}
+dat %>% group_by(race, Gender) %>% summarize(median_age = median(Age)) %>% arrange(median_age)
+```
+
+## Dates and times
+
+- as.Date("1970-01-01")
+- format(x, "%B %d, %Y) --> September 27, 2023
+- predefined: month.name and month.abb
+- use as.numeric to make sure date is a number
+
+- Lubridate package
+  - weeks()
+  - as_date()
+  - today()
+  - month(dates, label = TRUE)
+  - year()
+  - day()
+  - ymd(x)
+  - mdy(x)
+  - dmy(x)
+  - now()
+  - now("GMT") for different timezones
+  - now() %>% hour()
+  - now() %>% minute() or second()
+  - hms(x) - hour minute second
+- Sequences
+  - x <- seq(today(), today() + 7, by = "days")
+  - wday()
+  - floor_date()
+- day of year or month: 
+  - yday(x)
+  - mday(x)
+
+# Exercises
+
+```{r}
+library(lubridate)
+library(tidyverse)
+library(purrr)
+library(pdftools)
+```
+
+```{r}
+library(dslabs)
+
+fn <- system.file("extdata", "RD-Mortality-Report_2015-18-180531.pdf",
+                  package="dslabs")
+dat <- map_df(str_split(pdf_text(fn), "\n"), function(s){
+  s <- str_trim(s)
+  header_index <- str_which(s, "2015")[1]
+  tmp <- str_split(s[header_index], "\\s+", simplify = TRUE)
+  month <- tmp[1]
+  header <- tmp[-1]
+  tail_index  <- str_which(s, "Total")
+  n <- str_count(s, "\\d+")
+  out <- c(1:header_index, which(n == 1), 
+           which(n >= 28), tail_index:length(s))
+  res <- s[-out] |>  str_remove_all("[^\\d\\s]") |> str_trim() |>
+    str_split_fixed("\\s+", n = 6) 
+  res <- data.frame(res[,1:5]) |> as_tibble() |> 
+    setNames(c("day", header)) |>
+    mutate(month = month, day = as.numeric(day)) |>
+    pivot_longer(-c(day, month), names_to = "year", values_to = "deaths") |>
+    mutate(deaths = as.numeric(deaths)) |>
+    mutate(month = str_to_title(month)) |>
+    mutate(month = if_else(month=="Ago", "Aug", month))
+}) 
+```
+
+```{r}
+dat <- dat %>% mutate(year = as.numeric(year))
+```
+
+```{r}
+dat <- dat %>% mutate(month = match(month, month.abb))
+```
+
+```{r}
+dat <- dat %>% mutate(date = make_date(year = year, month = month, day = day))
+```
+
+```{r}
+with(dat, plot(date, deaths))
+```
+
+```{r}
+dat <- dat %>% filter(date < "2018-05-01")
+with(dat, plot(date, deaths))
+```
+
+```{r}
+with(dat, plot(yday(date), deaths, col = yday(date)))
+```
+
+```{r}
+dat1 <- dat %>% group_by(date = floor_date(date, unit = "month")) %>% summarize(avg = mean(deaths))
+dat1
+```
+
+```{r}
+dat1 %>% filter(month(date) %in% c("7", "9"))
+```
+September 2017 is an outlier. 
+
+```{r}
+dat2 <- dat %>% group_by(date = floor_date(date, unit = "week")) %>% summarize(deaths = mean(deaths)) 
+with(dat2, plot(date, deaths))
+```
+
+## Importing data
+
+- file_path <- file.path(dir, "murders.csv")
+- file.copy(file_path, csv)
+- readLines("file", n=3)
+- dat <- read.csv("murders.csv")
+
+- readr
+  - text file
+  - library(readr)
+  - read_line("file", n_max = num)
+  - read_csv()
+- readxl
+  - library(readxl)
+  
+- downloading files
+  - url <- ""
+  - dat <- read_csv(url)
+  - or
+  - tmp_filename <- tempfile()
+  - download.file(url, tmp_filename)
+  - dat <- read_csv(tmp_filename)
+  - file.remove(tmp_filename)
+
+- Encoding
+  - weird characters when reading in
+  - guess_encoding(url)
+  - read_csv(url, locale = locale(encoding = "", decimal_mark = ""))
+
+# Exercises
+```{r}
+library(readr)
+path <- system.file("extdata", package = "dslabs")
+files <- list.files(path, pattern = ".csv")
+res <- lapply(files, function(fn) read_csv(file.path(path, fn), show_col_types = FALSE))
+```
+```{r}
+for(i in seq_along(files)){
+  print(files[i])
+  read_csv(file.path(path,files[i]), show_col_types = FALSE)
+}
+```
+
+```{r}
+read_lines(file.path(path, "olive.csv"), n_max = 2)
+```
+
+```{r}
+read_csv(file.path(path, "olive.csv"), col_names = FALSE, skip = 1)
+```
+
+```{r}
+colnames <- read_lines(file.path(path, "olive.csv"), n_max = 1) 
+colnames <- strsplit(colnames, ",") |> unlist()
+colnames[1] <- "row_number"
+names(dat) <- colnames
+```
+
+
+## Distributions
+
+- distribution: most basic statistical summary of a list of objects or numbers
+- Histograms: easier to read that cdfs
+- Smoothed density: relay same info as a histogram but nicer
+- Normal distribution: defined by average (mean) and standard deviation
+  - mean <- sum(x) / length(x)
+  - sd <- sqrt(sum((x-mu)^2)/length(x))
+  - or use mean() and sd()
+- Boxplots: five number summary and shows outliers
+- Stratification: informative to show conditional distributions
+
+
+# Exercises
+```{r}
+library(dplyr)
+library(dslabs)
+library(tidyverse)
+qs <- c(10, 30, 50, 70, 90)
+heights %>% group_by(sex) %>% 
+  reframe(quantile = paste0(qs, "%"), value = quantile(height, qs/100)) %>%
+  pivot_wider(names_from = sex) %>% 
+  rename(female_perc = Female, male_perc = Male)
+```
+2. Continent with the country with the largest population size = Asia
+3. Continent with largest median population size = Africa
+4. What is median pop size for Africa to nearest million = 10 million
+5. what proportion of countries in Europe have populations below 14 million = 75%
+6. log transformation - Americas?
+```{r}
+x <- heights %>% filter(sex == "Male") %>% select(height) %>% pull(height)
+```
+
+```{r}
+mean(x > 69 & x < 72)
+```
+
+## ggplot2
+
+- library dplyr
+- library ggplot2
+- x %>% ggplot(data, ) + geom_point(aes(x, y)) + geom_text(aes(, , label= ))
+- define a global aes in ggplot function. all layers will assume this mapping unless we explicitly define another one
+- scale_x_continuous(trans = "log10")
+- labs, xlab, ylab, ggtitle
+- aes(col = )
+- geom_abline(intercept = )
+- ds_theme_set()
+- facet_wrap
+- grid.arrange()
+- geom_bar()
+- geom_histogram(binwidth = )
+- geom_density()
+- geom_boxplot()
+- geom_qq()
+
+# Exercises
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(dslabs)
+```
+
+```{r}
+plot <- heights %>% ggplot(aes(x = height))
+```
+
+```{r}
+plot + geom_histogram(binwidth = 1)
+```
+```{r}
+plot + geom_density()
+```
+
+```{r}
+plot + geom_density(aes(group = sex))
+```
+```{r}
+plot + geom_density(aes(fill = sex))
+```
+```{r}
+plot + geom_density(aes(fill = sex, alpha = 0.2))
+```
+
+```{r}
+p <- heights %>% ggplot()
+```
+
+9. C - total and population 
+
+```{r}
+p <- murders %>% ggplot(aes(total, population)) + geom_point()
+p
+```
+```{r}
+murders %>% ggplot(aes(population, total, label = abb)) + geom_label()
+```
+
+- need to map a character at each point through the label argument in aes
+
+```{r}
+murders %>% ggplot(aes(population, total, label = abb)) + geom_label(col = "blue")
+```
+- because we want all colors to be blue, we do not need to map colors, just use the color argument in geom_label
+
+- if we want to use color to represent the different region, each label needs a different color so we map the colors through the color argument of aes
+
+```{r}
+murders %>% ggplot(aes(population, total, label = abb, color = region)) + geom_label()
+```
+
+```{r}
+p <- murders %>% ggplot(aes(population, total, label = abb, color = region)) + geom_label() + scale_x_log10()
+p
+```
+
+```{r}
+p <- murders %>% ggplot(aes(population, total, label = abb, color = region)) + geom_label() + scale_x_log10() + scale_y_log10()
+p
+```
+
+```{r}
+p <- murders %>% ggplot(aes(population, total, label = abb, color = region)) + geom_label() + scale_x_log10() + scale_y_log10() + ggtitle("Gun murder data")
+p
+```
+
+## Data Visualization Principles
+
+- tidyverse, gridExtra
+- barplots should start at 0 otherwise misinformative 
+- order categories by a meaningful value 
+  - highest to lowest or lowest to highest
+- reorder function in mutate
+- use common axes (free y)
+- proper alignment of graphs to make comparisons
+- use log transformations
+- limit significant digits - signif, round, options(digits = 3)
+
+# Exercises
+
+```{r}
+library(dslabs)
+```
+
+1. Pie charts are appropriate: Never. Barplots and tables are always better. 
+
+2. The axis does not start at 0. Judging by the length, it appears Trump received 3 times as many votes when, in fact, it was about 30% more. 
+
+3. The plot on the right is better because alphabetical order has nothing to do with the disease and by ordering according to actual rate, we quickly see the states with the most and least
+
+4. 
+```{r}
+dat <- us_contagious_diseases |>  
+  filter(year == 1967 & disease=="Measles" & !is.na(population)) |>
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+```
+
+```{r}
+dat |> ggplot(aes(state, rate)) +
+  geom_bar(stat="identity") +
+  coord_flip() 
+```
+```{r}
+state <- dat$state
+rate <- dat$count/dat$population*10000*52/dat$weeks_reporting
+```
+
+```{r}
+state <- reorder(state, rate)
+```
+
+5. 
+```{r}
+dat <- us_contagious_diseases |>  
+  filter(year == 1967 & disease=="Measles" & !is.na(population)) |>
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) %>% 
+  mutate(state = reorder(state, rate))
+```
+
+```{r}
+dat |> ggplot(aes(state, rate)) +
+  geom_bar(stat="identity") +
+  coord_flip() 
+```
+6. 
+```{r}
+library(dslabs)
+murders |> mutate(rate = total/population*100000) |>
+group_by(region) |>
+summarize(avg = mean(rate)) |>
+mutate(region = factor(region)) |>
+ggplot(aes(region, avg)) +
+geom_bar(stat="identity") +
+ylab("Murder Rate Average")
+```
+C - this does not show all the data. We do not see variability within a region and it's possible that the safest states are not in the West. 
+
+7. 
+```{r}
+murders |> 
+  mutate(rate = total/population*100000) %>% 
+  mutate(region = reorder(region, rate)) %>% 
+  ggplot() +
+  geom_boxplot(aes(region, rate))
+```
+
+8. Humans are not good at reading pseudo-3D plots. 
+
+## Wrangling
+
+- read pdf using pdftools 
+- system.file()
+- pdf_text()
+- strsplit(dat, "\n")
+
+- Reshaping data
+  - pivot_longer()
+  - usually easier to name the columns not to be pivoted
+  - assumes that column names are characters 
+  - pivot_wider()
+- Separate
+  - separate(name, c("year", "name"), "_", fill = "right", extra="merge")
+- Unite
+  - unite(name, first_var_name, second_var_name)
+
+- Joins
+  - left_join(data, data2, by = "")
+  - slice(1:6)
+  - left join, right join, inner join, full join, semi join, anti join, interset, union, setdiff, setequal
+
+- String processing 
+  - stringr package
+  - is.na()
+  - str_detect()
+  
+- Regular Expressions
+  - str_detect()
+  - str_view_all(s, pattern)
+
+# Exercises
+```{r}
+library(tidyverse)
+library(dslabs)
+co2_wide <- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) |> 
+  setNames(1:12) |>
+  mutate(year = as.character(1959:1997))
+co2_wide
+```
+
+```{r}
+co2_tidy <- co2_wide %>% pivot_longer(cols = '1':'12', names_to = "month", values_to = "co2")
+co2_tidy
+```
+
+```{r}
+co2_tidy |> ggplot(aes(month, co2, color = year)) + geom_line()
+```
+
+```{r}
+class(co2_tidy$month)
+```
+
+```{r}
+co2_tidy$month <- as.numeric(co2_tidy$month)
+```
+
+3. B --> CO2 measures are higher in the summer and the yearly average increased from 1959 to 1997
+
+```{r}
+library(dslabs)
+library(tidyverse)
+dat <- admissions %>% select(-applicants)
+dat
+```
+```{r}
+dat %>% pivot_wider(names_from = gender, values_from = admitted)
+```
+
+```{r}
+admissions
+```
+
+
+```{r}
+tmp <- admissions %>% pivot_longer(cols = admitted:applicants, names_to = "name", values_to = "value")
+tmp
+```
+
+```{r}
+tmp <- tmp %>%  unite(column_name, name, gender)
+tmp
+```
+```{r}
+tmp %>% pivot_wider(names_from = column_name, values_from = value)
+```
+
+```{r}
+admissions %>% 
+  pivot_longer(cols = admitted:applicants, names_to = "name", values_to = "value") %>%
+  unite(column_name, name, gender) %>%
+  pivot_wider(names_from = column_name, values_from = value)
+```
+
+```{r}
+library(Lahman)
+```
+
+```{r}
+top <- Batting |> 
+  filter(yearID == 2016) |>
+  arrange(desc(HR)) |>
+  slice(1:10)
+
+top |> as_tibble()
+top <- top %>% select(playerID, HR)
+top
+```
+
+```{r}
+people <- People |> as_tibble()
+people <- people %>% select(playerID, nameFirst, nameLast)
+people
+```
+
+```{r}
+top <- top %>% left_join(people, "playerID")
+top
+```
+
+```{r}
+salaries <- Salaries %>% as_tibble() %>% filter(yearID == "2016") %>% select(teamID, playerID, salary)
+salaries
+top <- top %>% right_join(salaries, "playerID")
+top %>% select(nameFirst, nameLast, teamID, HR, salary)
+```
+
+```{r}
+co2_wide <- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) |> 
+  setNames(1:12) |>
+  mutate(year = 1959:1997) |>
+  pivot_longer(-year, names_to = "month", values_to = "co2") |>
+  mutate(month = as.numeric(month))
+co2_wide
+```
+
+```{r}
+yearly_avg <- co2_wide %>% group_by(year) %>% summarize(avg_co2 = mean(co2))
+yearly_avg
+```
+
+```{r}
+co2_wide <- co2_wide %>% left_join(yearly_avg, "year")
+co2_wide
+```
+
+```{r}
+co2_wide['residuals'] = co2_wide['co2'] - co2_wide['avg_co2']
+co2_wide
+```
+
+```{r}
+co2_wide %>% mutate(year = as.character(year)) %>% 
+  ggplot(aes(month, residuals, color = year)) +
+  geom_point()
+```
+
+## Locales
+
+- Sys.getlocale()
+
+## Probability 
+
+- Monte Carlo
+  
+```{r}
+bdays <- sample(1:365, size = 1, replace = TRUE)
+```
+
+- taking n samples over and over again 
+```{r}
+n <- 25
+B <- 10^5
+replicate(B, {
+  bdays <- sample(1:365, size = n, replace = TRUE)
+  any(duplicated(bdays))
+}) %>% mean()
+```
+
+- Random Variables 
+```{r}
+replicate(10, sample(c(-1,1), size = 1, prob = c(9/19, 10/19)))
+```
+- these are outcomes of random variable X with Pr(X = 1) = 10/19 and Pr(X = -1) = 9/19
+Pr(S < 0)
+```{r}
+x <- sample(c(-1,1), size = 1000, replace = TRUE, prob = c(9/19, 10/19))
+s <- sum(x)
+s
+```
+
+adding in monte carlo: 
+```{r}
+s <- replicate(10^5,{
+  x <- sample(c(-1, 1), size = 1000, replace = TRUE, prob = c(9/19, 10/19))
+  sum(x)
+})
+plot(table(s))
+```
+
+- CLT
+- the distribution of the sum of independent equally distributed random variables can be approximted with a normal distribution
+- need to know mean E[Sn] and standard error SE[Sn]
+- Pr(a < Sn < b) = Pr(a - E[Sn]/SE[Sn] < Z < b - E[Sn]/SE[Sn])
+- Z = (Sn - E[Sn])/SE[Sn]
+- mu = E[X]
+- sigma^2 = Var[X] = E[(X-mu)^2]
+- sd(x) --> does not compute standard error or sd. estimates population sd based on s sample. divides by n-1 instead of n. No difference as n is 1 million. 
+
+- Pr(Z < -sqrt(n)mu/sigma) 
+  - pnorm()
+- to get n, use ceiling((-sigma/mu * qnorm(0.01))^2)
+
+# Exercises 1
+```{r}
+n <- 1000
+mu <- 1/19
+sigma <- 2*sqrt(9/19*10/19)
+pnorm(-sqrt(n)*mu/sigma)
+n <- ceiling((-sigma/mu*qnorm(0.01))^2)
+n
+```
+```{r}
+s <- replicate(10^5,{
+  x <- sample(c(-1, 1), size = n, replace = TRUE, prob = c(9/19, 10/19))
+  sum(x)
+})
+mean(s < 0)
+```
+
+```{r}
+s <- replicate(10^5,{
+  x <- sample(c(-1, 1), size = n, replace = TRUE, prob = c(9/19, 10/19))
+  mean(x)
+})
+mean(s < 0)
+```
+
+E[Xbar] = E[Sn/n] = 1/nE[Sn] = 1/n * n * mu = mu
+
+SE[Xbar] = SE[Sn/n] = 1/nSE[Sn] = 1/n * sqrt(n) * sigma = sigma/sqrt(n)
+
+When n is very large, same mean approaches mu and distribution of sample mean becomes narrower. same mean X bar become more accurate and precise estimator of population mean mu 
+
+- Law of Small Numbers
+
+# Exercise
+```{r}
+s <- replicate(10^3,{
+  x <- sample(c(0, 1), size = 5*10^5, replace = TRUE, 
+              prob = c(1 - 10^-6, 10^-6))
+  sum(x)
+})
+sapply(0:3, function(k) mean(s == k))
+```
+
+```{r}
+dpois(0:3, 0.5)
+```
+
+- formula for sum of variance: Var(X1 + X2) = Var(X1) + Var(X2) + 2Cov(X1, X2)
+- if variables are positively correlated, variance goes up
+
+# Exercises 3
+```{r}
+b = 10^5
+
+s <- replicate(b, {
+  x <- sample(c(0, 1), size = 7, replace = TRUE, prob = c(0.6, 0.4))
+  sum(x) == 0
+})
+1 - mean(s)
+```
+
+```{r}
+b = 10^5
+
+s <- replicate(b, {
+  x <- sample(c(0, 1), size = 6, replace = TRUE, prob = c(0.5, 0.5))
+  sum(x) >= 4
+})
+mean(s)
+```
+
+```{r}
+b = 10^5
+p <- seq(0.5, 0.95, 0.025)
+prob_win <- function(p){
+  s <- replicate(b, {
+    x <- sample(c(0, 1), size = 7, replace = TRUE, prob = c(p, 1-p))
+  sum(x) >= 4
+})
+mean(s)
+}
+pr <- sapply(p, prob_win)
+plot(p, pr)
+```
+
+```{r}
+b = 10^5
+p <- 0.75
+n <- seq(1, 25, 2)
+prob_win <- function(n){
+  s <- replicate(b, {
+    x <- sample(c(0, 1), size = n, replace = TRUE, prob = c(p, 1-p))
+  sum(x) >= (n+1)/2
+})
+mean(s)
+}
+pr <- sapply(n, prob_win)
+plot(n, pr)
+```
+
+```{r}
+mu <- 64
+sd <- 3
+pnorm(67, mu, sd) - pnorm(61, mu, sd)
+```
+
+```{r}
+ev <- 69
+sd <- 3
+qnorm(0.99, ev, sd)
+```
+
+```{r}
+avg <- 100
+sd <- 15
+B = 1000
+
+s <- replicate(B, {
+  x <- rnorm(10000, avg, sd)
+  max(x)
+})
+
+hist(s)
+
+```
+
+```{r}
+r <- 18
+b <- 18
+g <- 2
+
+p_green <- g/(r+b+g)
+p_green
+```
+
+```{r}
+sample(c(-1, 17), size = 1, replace = TRUE, prob = c(18/19, 1/19))
+```
+
+```{r}
+exp_x = -1 * 18/19 + 17 * 1/19
+exp_x
+```
+
+```{r}
+se_x = abs(17 - -1) * sqrt(1/19 * 18/19)
+se_x
+```
+
+```{r}
+x <- replicate(1000, {
+  rep <-sample(c(-1, 17), size = 1, replace = TRUE, prob = c(18/19, 1/19))
+})
+sum(x)
+```
+
+```{r}
+e_S <- 1000 * (17 * 1/19 + -1 * 18/19)
+e_S
+```
+
+```{r}
+p <- 1/19
+st_error_S <- sqrt(1000) * 18 * sqrt(p*(1-p))
+st_error_S
+```
+
+```{r}
+1 - pnorm(0, e_S, st_error_S)
+```
+
+```{r}
+B <- 100000
+x <- replicate(B, {
+  n <- 1000
+  rep <- sample(c(-1, 17), size = n, replace = TRUE, prob = c(18/19, 1/19))
+  sum(rep)
+})
+mean(x)
+```
+```{r}
+sd(x)
+```
+```{r}
+mean(x > 0)
+```
+
+## Inference
+
+- quantity p tells us proportion of blue beads is 1-p and spread is p-(1-p)
+- sample average = Xbar = 1/n sum(X)
+- E(x) = p and SE(X) = sqrt(p(1-p)/N)
+- based on CLT:
+  - X ~ Normal(p, sqrt(p(1-p)/n))
+  - Pr(|X-p| <= 0.01) = Pr(X-p <= 0.01) - Pr(X-p <= -0.01)
+  - Pr(Z <= 0.01/SE(X)) - Pr(Z <= -0.01/SE(X))
+  - SE(X) = sqrt(X(1-X)/N)
+  - margin of error --> 1.96*se
+  - pnorm(1.96) - pnorm(-1.96) = 0.95
+  
+- Confidence Intervals
+= [X - 1.96SE(X), X + 1.96SE(X)]
+= Pr(1.96 <= X-p/SE(X) <= 1.96)
+= Pr(-1.96 <= Z <= 1.96)
+- qnorm gives us the bound values
+- 95% --> 1-0.95 = 0.05 / 2 --> 1-0.025 goes into pnorm
+- CI - (x_hat +/- qnorm(0.975) *se_hat)
+- CI = p +/- Zsqrt(p(1-p)/n)
+
+# Exercises
+
+```{r}
+p <- seq(0, 1, length = 100)
+se <-sqrt(p * (1-p)/1000)
+plot(se, p)
+```
+
+2. mu = Xbar - (1- Xbar) = 2Xbar - 1 
+E[mu] = E[2Xbar - 1] = 2E[Xbar] -1 = 2p-1
+(p = muhat + 1 / 2)
+
+se[mu] = SE[2Xbar - 1] = 2SE[X] = 2*sqrt(p(1-p)/N)
+
+^for differences
+
+3. SE[2Xhat - 1] = 
+```{r}
+2*sqrt(0.45*0.55/25)
+```
+
+4. B --> Our standard error is larger than the difference, so the chances of 2X-1 being positive and throwing us off were not that small. We should pick a larger sample size.
+
+
+```{r}
+library(dslabs)
+library(tidyverse)
+polls <- polls_us_election_2016 |> 
+  filter(enddate >= "2016-10-31" & state == "U.S.") 
+```
+
+```{r}
+N <- polls$samplesize[1]
+x_hat <- polls$rawpoll_clinton[1]/100
+```
+
+```{r}
+se_hat <- sqrt(x_hat * (1-x_hat)/N)
+se_hat
+```
+```{r}
+qnorm(0.975)
+```
+```{r}
+qnorm(0.975)
+c(x_hat - 1.96*se_hat, x_hat + 1.96*se_hat)
+```
+
+```{r}
+polls
+```
+
+
+```{r}
+polls <- polls %>% mutate(x_hat = rawpoll_clinton/100, se_hat = sqrt((x_hat * (1-x_hat))/samplesize), lower = x_hat - 1.96*se_hat, upper = x_hat + 1.96*se_hat)
+polls <- polls %>% select(pollster, enddate, x_hat, lower, upper)
+polls
+```
+
+
+```{r}
+polls <- polls %>% mutate(hit = (0.482 >= lower & 0.482 <= upper)) 
+polls
+```
+
+```{r}
+mean(polls$hit)
+```
+
+9. If these confidence intervals are constructed correctly and the theory holds up, 95% should include p. 
+
+```{r}
+polls <- polls_us_election_2016 |> 
+  filter(enddate >= "2016-10-31" & state == "U.S.")  |>
+  mutate(mu_hat = rawpoll_clinton / 100 - rawpoll_trump / 100)
+head(polls)
+```
+2*sqrt(p(1-p)/N)
+
+```{r}
+polls <- polls %>% mutate(p = (mu_hat+1)/2, se = 2*sqrt(p*(1-p))/sqrt(samplesize)) %>% 
+  mutate(lower = mu_hat - 1.96*se, upper = mu_hat + 1.96*se)
+head(polls)
+```
+
+```{r}
+polls %>% mutate(hit = (0.021 >= lower & 0.021 <= upper)) %>% summarize(mean(hit)) 
+```
+
+```{r}
+polls
+```
+
+```{r}
+polls %>% mutate(errors = mu_hat - 0.021) %>% ggplot(aes(x = pollster, y = errors)) + geom_point() + theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1))
+```
+
+```{r}
+polls %>% group_by(pollster) %>% filter(n() > 5) %>% mutate(errors = mu_hat - 0.021) %>% ggplot(aes(x = pollster, y = errors)) + geom_point() + theme(axis.text.x = element_text(angle=45, size = 5, hjust = 1))
+```
+
+## Models
+
+```{r}
+library(dslabs)
+library(tidyverse)
+
+mu <- 0.039
+Ns <- c(1298, 533, 1342, 897, 774, 254, 812, 324, 1291, 1056, 2172, 516)
+p <- (mu + 1) / 2
+
+polls <- map_df(Ns, function(N) {
+  x <- sample(c(0, 1), size = N, replace = TRUE, prob = c(1 - p, p))
+  x_hat <- mean(x)
+  se_hat <- sqrt(x_hat * (1 - x_hat) / N)
+  list(estimate = 2 * x_hat - 1, 
+    low = 2*(x_hat - 1.96*se_hat) - 1, 
+    high = 2*(x_hat + 1.96*se_hat) - 1,
+    sample_size = N)
+}) |> mutate(poll = seq_along(Ns))
+
+```
+
+
+- construct an estimate of the spread, mu, with a weighted average: 
+
+```{r}
+mu_hat <- polls |> 
+  summarize(avg = sum(estimate*sample_size) / sum(sample_size)) |> 
+  pull(avg)
+```
+
+- margin of error is: 
+```{r}
+p_hat <- (1 + mu_hat)/2; 
+moe <- 2*1.96*sqrt(p_hat*(1 - p_hat)/sum(polls$sample_size))
+moe
+```
+
+- continuous numbers - E[X] = mu and SD(X) = mu
+- if we consider N to be large enough to assume that the sample average X = sum(Xi)
+with E(X) = mu and SE(X) = sigma/sqrt(N)
+then X ~ N(mu, sigma/sqrt(N))
+
+- sd function computes the sample standard deviation
+
+- se = sd(spread) / sqrt(length(spread))
+- avg = mean(spread)
+
+- t distribution: we don't know sigma so we use
+t = Xbar - mu / s/sqrt(N)
+  - t follows a student t distribution with N-1 degrees of freedom (controls the variability)
+  - CIs for mu --> avg = mean(spread), moe = z * sd(spread)/sqrt(length(spread))
+  - CI is avg +/- moe
+  - z <- qt(0.975, nrow(x)-1)
+  
+- Bayesian Models
+mu ~ N(theta, tau)
+- theta is our best guess of difference had we not seen the data and tau is quantifying how certain we feel about this guess
+
+# Exercises
+
+```{r}
+library(dslabs)
+x <- heights |> filter(sex == "Male") |>
+  pull(height)
+```
+
+```{r}
+mean(x)
+sd(x)
+```
+
+```{r}
+mu <- mean(x)
+sd <- sd(x)
+n <- 50
+X <- sample(x, n, replace = TRUE)
+X_bar <- mean(X)
+sd(X)
+```
+
+3. B --> the theory tells us that the sample average Xbar is a random variable with expected value mu and standard error sigma/sqrt(N)
+
+4. if we don't know sigma, estimate is sd(X)
+```{r}
+s <- sd(X)
+s
+```
+
+
+5. 
+```{r}
+qnorm(0.975)
+c(X_bar - 1.95*s/sqrt(50), X_bar + 1.95*s/sqrt(50))
+```
+
+```{r}
+B <- 10000
+n <- 50
+mc <- replicate(B, {
+  samp <- sample(x, n, replace = TRUE)
+  interval <- c(mean(samp) - 1.95*sd(samp)/sqrt(n), mean(samp) + 1.95*sd(samp)/sqrt(n))
+  between(mu, interval[1], interval[2])
+})
+mean(mc)
+```
+
+7. 
+```{r}
+N <- 35
+diff <- sapply(2:N, function(n){
+  X <- sample(x, n, replace = TRUE)
+  q1 <- qnorm(p = 0.975, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+  q2 <- qt(p = 0.975, df = n-1, lower.tail = TRUE, log.p = FALSE)
+  abs(q2-q1)
+})
+plot(2:N, diff)
+```
+
+
+8. Sir Meadow assumed that the probability of the second son being affected by SIDS was independent of the first son being affected, thereby ignoring possible genetic causes. If genetics plays a role, then Pr(second case of SIDS | first case of SIDS) > Pr(first case of SIDS)
+
+
+9. 
+
+```{r}
+library(tidyverse)
+library(dslabs)
+polls <- polls_us_election_2016 |> 
+  filter(state == "Florida" & enddate >= "2016-11-04" ) |> 
+  mutate(spread = rawpoll_clinton/100 - rawpoll_trump/100)
+```
+```{r}
+results <- polls %>% summarize(avg = mean(spread), se_polls = sd(spread)/sqrt(n()))
+results
+```
+
+10. 
+B --> theta and tau summarize what we would predict for Florida before seeing any polls. Based on past elections we would set mu close to 0 because both Republicans and Democrats have won, and tau at about 0.02, because these elections tend to be close. 
+
+11. Posterior: 
+
+```{r}
+theta <- 0
+tau <- 0.01
+sigma <- results$se
+x_bar <- results$avg
+B <- sigma^2 / (sigma^2 + tau^2)
+
+posterior_mean <- B*theta + (1 - B)*x_bar
+posterior_se <- sqrt(1/(1/sigma^2 + 1/tau^2))
+
+posterior_mean
+posterior_se
+```
+
+```{r}
+interval <- c(posterior_mean - 1.96*posterior_se, posterior_mean + 1.96*posterior_se)
+interval
+```
+
+
+```{r}
+pnorm(0, posterior_mean, posterior_se)
+```
+
+tau = variance
+
+```{r}
+func <- function(k){
+  B <- sigma^2 / (sigma^2 + k^2)
+  posterior_mean <- B*theta + (1 - B)*x_bar
+  posterior_se <- sqrt(1/(1/sigma^2 + 1/k^2))
+  pnorm(0, posterior_mean, posterior_se)
+} 
+vars <- seq(0.005, 0.05, len = 100)
+vals <- sapply(vars, func)
+plot(vals)
+```
+
+```{r}
+batting_avg <- 0.45
+interval <- c(batting_avg - 1.96*sqrt(batting_avg * 1-batting_avg/500), batting_avg + 1.96*sqrt(batting_avg * 1-batting_avg/500))
+interval
+```
+
+
+
+
+
+
+
+
+
+
+
+
+-

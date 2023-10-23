@@ -1,0 +1,100 @@
+---
+title: "Lecture 3 - R Basics"
+format: html
+editor: visual
+---
+
+command option i
+
+```{r}
+install.packages("dslabs")
+```
+
+```{r}
+sessionInfo
+```
+
+```{r}
+x <- 7
+```
+
+```{r}
+ls()
+```
+
+```{r}
+str(x)
+```
+
+```{r}
+library(dslabs)
+typeof(murders)
+class(murders)
+str(murders)
+```
+
+```{r}
+head(murders)
+```
+
+```{r}
+y <- c("b","s","t"," ","2","6","0")
+seq_along(y)
+```
+
+```{r}
+levels(murders$region)
+```
+
+```{r}
+factor(x, levels = sort(levels(murders$region)))
+```
+
+```{r}
+x <- sample(murders$state[c(5,33,44)], 10^7, replace = TRUE)
+y <- factor(x)
+object.size(x)
+```
+
+```{r}
+?factor
+```
+
+```{r}
+system.time({levels(y) <- tolower(levels(y))})
+```
+
+```{r}
+1+2+NA
+```
+
+command shift 0 to restart R session
+
+EXERCISES: 1 & 2
+
+```{r}
+n1 <- 100
+n2 <- 1000
+function_sum <- function(n){
+  return (n*(n+1)/2)
+}
+function_sum(n1)
+function_sum(n2)
+```
+
+
+```{r}
+n <- 100
+x <- seq(1,n)
+sum(x)
+```
+
+```{r}
+log(sqrt(100), base = 10)
+log10(sqrt(100))
+```
+
+```{r}
+library(dslabs)
+str(murders)
+```

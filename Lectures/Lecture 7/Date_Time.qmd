@@ -1,0 +1,105 @@
+---
+title: "Date and Time"
+format: html
+editor: visual
+---
+
+```{r}
+library(lubridate)
+```
+
+```{r}
+now() %>% hour()
+```
+
+## EXERCISE 1
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(purrr)
+library(pdftools)
+```
+
+```{r}
+library(dslabs)
+
+fn <- system.file("extdata", "RD-Mortality-Report_2015-18-180531.pdf",
+                  package="dslabs")
+dat <- map_df(str_split(pdf_text(fn), "\n"), function(s){
+  s <- str_trim(s)
+  header_index <- str_which(s, "2015")[1]
+  tmp <- str_split(s[header_index], "\\s+", simplify = TRUE)
+  month <- tmp[1]
+  header <- tmp[-1]
+  tail_index  <- str_which(s, "Total")
+  n <- str_count(s, "\\d+")
+  out <- c(1:header_index, which(n == 1), 
+           which(n >= 28), tail_index:length(s))
+  res <- s[-out] |>  str_remove_all("[^\\d\\s]") |> str_trim() |>
+    str_split_fixed("\\s+", n = 6) 
+  res <- data.frame(res[,1:5]) |> as_tibble() |> 
+    setNames(c("day", header)) |>
+    mutate(month = month, day = as.numeric(day)) |>
+    pivot_longer(-c(day, month), names_to = "year", values_to = "deaths") |>
+    mutate(deaths = as.numeric(deaths)) |>
+    mutate(month = str_to_title(month)) |>
+    mutate(month = if_else(month=="Ago", "Aug", month))
+}) 
+```
+
+```{r}
+dat <- mutate(dat, year = as.numeric(year))
+```
+
+## EXERCISE 2
+
+```{r}
+month.abb
+```
+
+```{r}
+dat <- dat %>% mutate(month = match(month, month.abb))
+```
+
+## EXERCISE 3
+
+```{r}
+dat <- dat %>% mutate(date = make_date(year = year, month = month, day = day))
+dat
+```
+## EXERCISE 4
+
+```{r}
+with(dat, plot(date, deaths))
+```
+
+## EXERCISE 5
+
+```{r}
+dat <- dat %>% filter(date < "2018-05-01")
+with(dat, plot(date, deaths))
+```
+
+
+## 6
+
+```{r}
+with(dat, plot(yday(date), deaths, col = year))
+```
+
+
+## 7
+
+```{r}
+
+```
+
+
+## 8
+
+## 9
+
+
+
+

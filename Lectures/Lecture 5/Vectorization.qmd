@@ -1,0 +1,172 @@
+---
+title: "Lecture4_Vectorization"
+format: html
+editor: visual
+---
+
+```{r}
+library(dslabs)
+```
+
+```{r}
+heights <- c(69, 62, 66, 70, 70, 73, 67, 73, 67, 70)
+heights * 2.54 / 100
+```
+
+```{r}
+avg <- mean(heights)
+heights - avg
+```
+
+```{r}
+sd <- sd(heights)
+(heights-avg)/sd
+scale(heights)
+```
+
+```{r}
+murders$state
+```
+
+```{r}
+murders$rate <- with(murders, total/population* 100000)
+```
+
+```{r}
+inds <- with(murders, split(seq_along(region), region))
+murders$state[inds$West]
+```
+
+## Exercise 1
+
+```{r}
+#murders
+ind <- murders$rate < 1
+murders[ind, ]
+```
+
+```{r}
+inds <- which(murders$rate < 1)
+murders[inds,]
+
+#or:
+murders[murders$rate < 1, ]
+```
+
+## Exercise 2
+
+```{r}
+murders[murders$rate < 1 & murders$region == "West", ]
+```
+
+```{r}
+inds <- which(murders$rate < 1 & murders$region == "West")
+murders[inds,]
+```
+
+## Exercise 3
+
+```{r}
+dat <- murders[murders$rate < 1,]
+dat[which.max(dat$population),]
+```
+
+
+```{r}
+dat <- murders[murders$rate < 1,]
+dat[which.max(dat$population), ]
+#murders$abb[order(murders$population)]
+```
+
+## Exercise 4
+
+```{r}
+dat <- murders[murders$population > 10^7,]
+dat[which.min(dat$rate), ]
+```
+
+## Exercise 5
+
+```{r}
+
+```
+
+
+```{r}
+indexes <- split(1:nrow(murders), murders$region)
+sapply(indexes, function(ind){ sum(murders$total[ind])/sum(murders$population[ind])*10^5
+})
+```
+
+
+## Exercise 6: 
+
+```{r}
+# start at 6, max 55, increments of 4/7
+vect <- seq(6, 55, 4/7)
+length(vect)
+```
+
+## Exercise 7: 
+
+```{r}
+temp <- c(35, 88, 42, 84, 81, 30)
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", 
+          "San Juan", "Toronto")
+city_temps <- data.frame(name = city, temperature = temp)
+```
+
+## Exercise 8:
+
+```{r}
+sum_func <- function(n){
+  if(n == 1){
+    return (1)
+  }
+  else{
+    return (sum_func(n-1) + (1/(n*n)))
+  }
+}
+```
+```{r}
+sum_func(100)
+```
+
+```{r}
+(pi * pi)/6
+```
+
+
+```{r}
+1+(1/(2*2))+(1/(3*3))
+```
+
+
+## Exercise 9: 
+
+```{r}
+state_abbs <- c("MA", "ME", "MI", "MO", "MU")
+state_abbs %in% state.abb
+```
+
+
+## Exercise 10: 
+
+```{r}
+state_abbs <- c("MA", "ME", "MI", "MO", "MU")
+ans <- !which(state_abbs %in% state.abb)
+ans
+```
+
+
+## Exercise 11: 
+
+```{r}
+states <- c("NY", "CA", "TX")
+murders[murders$abb %in% states, ]
+```
+
+
+
+
+
